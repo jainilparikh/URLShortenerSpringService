@@ -8,6 +8,8 @@ import org.springframework.stereotype.Service;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 
+import static com.proCoder.URLIngestionService.Utils.Constants.DOMAIN_NAME;
+
 @Service
 public class URLShortenerService {
     @Autowired
@@ -45,7 +47,9 @@ public class URLShortenerService {
     }
 
     public String getLongFormURL(String shortURL) {
-        URLMappingDynamoModel result = urlShortenerRepository.findById(shortURL);
+        System.out.println(shortURL.substring(DOMAIN_NAME.length()));
+        URLMappingDynamoModel result = urlShortenerRepository.findById(
+                shortURL.substring(DOMAIN_NAME.length()));
         if (result != null) {
             return result.getLongFormURL();
         }

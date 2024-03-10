@@ -13,6 +13,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
+import static com.proCoder.URLIngestionService.Utils.Constants.DOMAIN_NAME;
+
 @RestController
 @RequestMapping("")
 public class URLController {
@@ -30,8 +32,9 @@ public class URLController {
     getUserData(@RequestBody GetShortURLRequest getShortURLRequest) {
         try {
             GetShortURLResponse response = new GetShortURLResponse();
-            String shortURL = shortenerService.generateShortenedURL(getShortURLRequest.getToShortenURL());
-            response.setShortenedURL("http://localhost:8080?=" + shortURL);
+            String shortURL = shortenerService
+                    .generateShortenedURL(getShortURLRequest.getToShortenURL());
+            response.setShortenedURL(DOMAIN_NAME + shortURL);
 
             return ResponseEntity.status(HttpStatus.ACCEPTED).body(response);
         } catch (RuntimeException e) {
