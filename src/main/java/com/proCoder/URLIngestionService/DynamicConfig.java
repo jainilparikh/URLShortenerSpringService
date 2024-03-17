@@ -16,8 +16,9 @@ import java.net.URI;
 @Configuration
 public class DynamicConfig {
     @Value("${amazon.dynamodb.endpoint}")
-    Logger logger = LoggerFactory.getLogger(DynamicConfig.class);
     private String endpoint;
+
+    Logger logger = LoggerFactory.getLogger(DynamicConfig.class);
     @Bean
     public DynamoDbClient getDynamoDbClient() {
         AwsCredentialsProvider credentialsProvider =
