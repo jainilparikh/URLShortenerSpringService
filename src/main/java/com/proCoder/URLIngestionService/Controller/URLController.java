@@ -2,18 +2,20 @@ package com.proCoder.URLIngestionService.Controller;
 
 import com.proCoder.URLIngestionService.Model.GetShortURLResponse;
 import com.proCoder.URLIngestionService.Model.GetShortURLRequest;
-import com.proCoder.URLIngestionService.Model.RedirectShortURLRequest;
-import com.proCoder.URLIngestionService.Model.RedirectShortURLResponse;
 import com.proCoder.URLIngestionService.Service.URLShortenerService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.PathVariable;
+
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
 
 import static com.proCoder.URLIngestionService.Utils.Constants.DOMAIN_NAME;
 
@@ -63,27 +65,29 @@ public class URLController {
     /**
      * Publicly-exposed API which on receipt of a short URL attempts
      * to redirect it to it's long-form counterpart.
-     * @param request: short-form URL
+     * @param shortURL: short-form URL
      * @return: 307 if success, 400 if no long-form mapping exists and 500 otherwise
      */
-    @RequestMapping(value = "/redirect", method = RequestMethod.POST)
-    ResponseEntity redirect(@RequestBody RedirectShortURLRequest request) {
-        logger.info("Received redirect request with URL: " + request.getShortURL());
+    @RequestMapping(value = "/{shortURL}", method = RequestMethod.GET)
+    void redirect(@PathVariable("shortURL") String shortURL,
+                            HttpServletResponse httpServletResponse) {
+        logger.info("Received redirect request with URL: " + shortURL);
 
         try {
-            String longFormURL = shortenerService.getLongFormURL(request.getShortURL());
+            String longFormURL = shortenerService.getLongFormURL(shortURL);
 
             if (longFormURL != null) {
-                RedirectShortURLResponse response = new RedirectShortURLResponse();
-                response.setRedirectURL(longFormURL);
-                return ResponseEntity.status(HttpStatus.TEMPORARY_REDIRECT).body(response);
+                httpServletResponse.sendRedirect("https://www.google.com");
             } else {
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+                httpServletResponse.setStatus(HttpServletResponse.SC_BAD_REQUEST);
             }
         } catch (RuntimeException e) {
             logger.error("Redirect: Error occurred when attempting to redirect URL:"
                     + e.getMessage(), e);
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+            httpServletResponse.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+        } catch (IOException e) {
+            logger.error("IOException when attempting to redirect: " + e.getMessage(), e);
+            httpServletResponse.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
         }
     }
 }

@@ -2,6 +2,8 @@ package com.proCoder.URLIngestionService.Service;
 
 import com.proCoder.URLIngestionService.Repository.URLShortenerRepository;
 import com.proCoder.URLIngestionService.Model.URLMappingDynamoModel;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -14,6 +16,7 @@ import static com.proCoder.URLIngestionService.Utils.Constants.DOMAIN_NAME;
 public class URLShortenerService {
     @Autowired
     private URLShortenerRepository urlShortenerRepository;
+    private Logger logger = LoggerFactory.getLogger(URLShortenerService.class);
     private String base64chars = "0123456789abcdefghijklmnopqrstuvwxyz_ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890";
 
     public String generateShortenedURL(String longFormURL) {
@@ -47,9 +50,9 @@ public class URLShortenerService {
     }
 
     public String getLongFormURL(String shortURL) {
-        System.out.println(shortURL.substring(DOMAIN_NAME.length()));
-        URLMappingDynamoModel result = urlShortenerRepository.findById(
-                shortURL.substring(DOMAIN_NAME.length()));
+        logger.info("Attempting to get longForm URL for: " + shortURL);
+        URLMappingDynamoModel result =
+                urlShortenerRepository.findById(shortURL);
         if (result != null) {
             return result.getLongFormURL();
         }
