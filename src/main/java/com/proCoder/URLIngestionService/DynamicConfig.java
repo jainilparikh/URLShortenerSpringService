@@ -1,5 +1,7 @@
 package com.proCoder.URLIngestionService;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -14,11 +16,14 @@ import java.net.URI;
 @Configuration
 public class DynamicConfig {
     @Value("${amazon.dynamodb.endpoint}")
+    Logger logger = LoggerFactory.getLogger(DynamicConfig.class);
     private String endpoint;
     @Bean
     public DynamoDbClient getDynamoDbClient() {
         AwsCredentialsProvider credentialsProvider =
                 DefaultCredentialsProvider.builder().build();
+
+        logger.info("Using DynamoDB endpoint: " + endpoint);
 
         return DynamoDbClient.builder()
                 .region(Region.US_EAST_1)
