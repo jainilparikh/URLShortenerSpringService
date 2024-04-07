@@ -10,7 +10,6 @@ import org.springframework.stereotype.Service;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 
-import static com.proCoder.URLIngestionService.Utils.Constants.DOMAIN_NAME;
 
 @Service
 public class URLShortenerService {

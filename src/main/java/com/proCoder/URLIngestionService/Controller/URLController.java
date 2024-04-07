@@ -19,6 +19,11 @@ import java.io.IOException;
 
 import static com.proCoder.URLIngestionService.Utils.Constants.DOMAIN_NAME;
 
+/**
+ * Exposes public-facing APIs that allow end-users to
+ * create short-urls and re-direct to their long-form.
+ * author: jainilvp
+ */
 @RestController
 @RequestMapping("")
 public class URLController {
@@ -54,6 +59,7 @@ public class URLController {
                     .generateShortenedURL(getShortURLRequest.getToShortenURL());
             response.setShortenedURL(DOMAIN_NAME + shortURL);
 
+            logger.info("Request successfully completed, response: " + response);
             return ResponseEntity.status(HttpStatus.ACCEPTED).body(response);
         } catch (RuntimeException e) {
             logger.error("getShortenedURL: Error occurred when attempting to create short URL: "
@@ -77,9 +83,14 @@ public class URLController {
             String longFormURL = shortenerService.getLongFormURL(shortURL);
 
             if (longFormURL != null) {
-                httpServletResponse.sendRedirect("https://www.google.com");
+                logger.info("Redirecting user to url: " + longFormURL);
+                httpServletResponse.sendRedirect(longFormURL);
             } else {
+                logger.info("Redirection failed, no mapping was found!");
+                 // TODO: Point this to our company's page (Free marketing!)
                 httpServletResponse.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+                httpServletResponse.sendError(HttpServletResponse.SC_BAD_REQUEST,
+                        "Mapping was not found, validate that your shortURL is correct!");
             }
         } catch (RuntimeException e) {
             logger.error("Redirect: Error occurred when attempting to redirect URL:"
