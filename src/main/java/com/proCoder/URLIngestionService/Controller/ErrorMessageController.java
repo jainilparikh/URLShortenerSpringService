@@ -40,6 +40,9 @@ public class ErrorMessageController implements ErrorController {
                 if (statusCode == HttpStatus.BAD_REQUEST.value()) {
                     return Files.readString(Path.of("src/main/resources/templates/error-400.html"));
                 }
+                if (statusCode == HttpStatus.UNAUTHORIZED.value()) {
+                    return "Unauthorized";
+                }
             }
 
             return Files.readString(Path.of("src/main/resources/templates/error-generic.html"));
